@@ -1,0 +1,236 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #0e1621; /* Темный фон вокруг */
+    color: #ffffff;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    height: 100vh;
+    background-color: #17212b;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* --- Сайдбар (Левая колонка) --- */
+.sidebar {
+    width: 320px;
+    background-color: #17212b;
+    border-right: 1px solid #242f3d;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 10px 15px;
+    background-color: #17212b;
+    border-bottom: 1px solid #242f3d;
+}
+
+.search-bar {
+    background-color: #242f3d;
+    color: #7f91a4;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.subjects-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.subject-item {
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #242f3d;
+    transition: background 0.2s;
+    font-size: 16px;
+}
+
+.subject-item:hover {
+    background-color: #202b36;
+}
+
+.subject-item.active {
+    background-color: #2b5278;
+    color: #fff;
+}
+
+/* --- Контент (Правая колонка) --- */
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #0e1621;
+    position: relative;
+}
+
+.content-header {
+    padding: 15px 20px;
+    background-color: #17212b;
+    border-bottom: 1px solid #242f3d;
+    display: flex;
+    align-items: center;
+    min-height: 60px;
+}
+
+.content-header h2 {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.back-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: #64b5f6;
+    font-size: 16px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.content-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+    line-height: 1.6;
+}
+
+.empty-state {
+    text-align: center;
+    color: #7f91a4;
+    margin-top: 100px;
+}
+
+/* --- Список тем --- */
+.topics-list {
+    list-style: none;
+}
+
+.topics-list li {
+    padding: 15px;
+    background-color: #17212b;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.topics-list li:hover {
+    background-color: #202b36;
+}
+
+/* --- Форма пароля --- */
+.password-form {
+    max-width: 400px;
+    margin: 50px auto;
+    background-color: #17212b;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.password-form h3 {
+    margin-bottom: 20px;
+    color: #64b5f6;
+}
+
+.password-form input {
+    width: 100%;
+    padding: 12px;
+    background-color: #242f3d;
+    border: 1px solid #3e546a;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 15px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.password-form button {
+    width: 100%;
+    padding: 12px;
+    background-color: #2b5278;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.password-form button:hover {
+    background-color: #3a6b9a;
+}
+
+.error-msg {
+    color: #e53935;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* --- Текст лекции --- */
+.lecture-text {
+    white-space: pre-wrap; /* Сохраняет переносы строк из txt */
+    font-size: 16px;
+    color: #e1e1e1;
+}
+
+/* --- Адаптивность (Мобильные) --- */
+@media (max-width: 768px) {
+    .app-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 10;
+        transition: transform 0.3s ease;
+    }
+
+    .content {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 5;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .app-container.show-content .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .app-container.show-content .content {
+        transform: translateX(0);
+    }
+
+    .back-btn {
+        display: block;
+    }
+    
+    .content-body {
+        padding: 15px;
+    }
+}

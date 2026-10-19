@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudKorpus - Лекции</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Левая колонка (Сайдбар) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="search-bar">Поиск (в разработке)</div>
+            </div>
+            <div class="subjects-list" id="subjectsList">
+                <!-- Сюда JS будет вставлять предметы -->
+            </div>
+        </aside>
+
+        <!-- Правая колонка (Контент) -->
+        <main class="content" id="content">
+            <header class="content-header" id="contentHeader">
+                <button class="back-btn" id="backBtn">← Назад</button>
+                <h2 id="headerTitle">Выберите предмет</h2>
+            </header>
+            
+            <div class="content-body" id="contentBody">
+                <div class="empty-state">
+                    <p>Добро пожаловать в StudKorpus.</p>
+                    <p>Выберите предмет слева, чтобы начать.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
