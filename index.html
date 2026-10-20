@@ -11,10 +11,11 @@
         <!-- Левая колонка (Сайдбар) -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="search-bar">Поиск (в разработке)</div>
+                <!-- Заменили div на input -->
+                <input type="text" id="searchInput" class="search-bar" placeholder="Поиск по темам и предметам...">
             </div>
             <div class="subjects-list" id="subjectsList">
-                <!-- Сюда JS будет вставлять предметы -->
+                <!-- Сюда JS будет вставлять предметы или результаты поиска -->
             </div>
         </aside>
 
@@ -28,7 +29,7 @@
             <div class="content-body" id="contentBody">
                 <div class="empty-state">
                     <p>Добро пожаловать в StudKorpus.</p>
-                    <p>Выберите предмет слева, чтобы начать.</p>
+                    <p>Выберите предмет слева или воспользуйтесь поиском, чтобы начать.</p>
                 </div>
             </div>
         </main>
