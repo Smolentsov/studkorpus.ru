@@ -1,9 +1,9 @@
 // ==========================================
-// 1. БАЗА ДАННЫХ ЛЕКЦИЙ
+// 1. БАЗА ДАННЫХ ЛЕКЦИЙ (Ваши данные)
 // ==========================================
 const lecturesData = {
     electro: {
-        title: 'Электротехника',
+        title: 'Электротехника (МПК 23 02 07)',
         topics: [
             { id: '01_electric_field', title: '1. Электрическое поле. Закон Кулона' },
             { id: '02_conductors_dielectrics', title: '2. Проводники и диэлектрики. Конденсаторы' },
@@ -83,29 +83,28 @@ const contentBodyEl = document.getElementById('contentBody');
 const headerTitleEl = document.getElementById('headerTitle');
 const backBtn = document.getElementById('backBtn');
 const appContainer = document.querySelector('.app-container');
+const searchInput = document.getElementById('searchInput'); // Поле поиска
 
 let currentSubject = null;
 let currentTopic = null;
 
 // ==========================================
-// 3. ГЕНЕРАЦИЯ ПАРОЛЯ (МОСКОВСКОЕ ВРЕМЯ)
+// 3. ГЕНЕРАЦИЯ ПАРОЛЯ
 // ==========================================
 function getDailyPassword() {
     const now = new Date();
-    // Переводим локальное время пользователя в UTC, затем прибавляем 3 часа для МСК
     const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
     const mskTime = new Date(utcTime + (3 * 3600000)); 
 
-    const year = String(mskTime.getFullYear()).slice(-2); // Последние 2 цифры года
+    const year = String(mskTime.getFullYear()).slice(-2);
     const month = mskTime.getMonth() + 1;
     const day = mskTime.getDate();
 
-    // Формула: Год * Месяц * День
     return (parseInt(year) * month * day).toString();
 }
 
 // ==========================================
-// 4. РЕНДЕРИНГ ИНТЕРФЕЙСА
+// 4. РЕНДЕРИНГ И ПОИСК
 // ==========================================
 function renderSubjects() {
     subjectsListEl.innerHTML = '';
@@ -120,20 +119,97 @@ function renderSubjects() {
     }
 }
 
+// Функция поиска
+function handleSearch() {
+    const query = searchInput.value.toLowerCase().trim();
+    
+    // Если поле пустое, показываем обычный список предметов
+    if (query.length === 0) {
+        renderSubjects();
+        return;
+    }
+
+    subjectsListEl.innerHTML = ''; // Очищаем
+    let foundAny = false;
+
+    for (const subjectKey in lecturesData) {
+        const subject = lecturesData[subjectKey];
+        
+        // 1. Проверяем, совпадает ли название предмета
+        const subjectMatches = subject.title.toLowerCase().includes(query);
+        
+        // 2. Ищем совпадения по темам
+        const matchingTopics = subject.topics.filter(topic => 
+            topic.title.toLowerCase().includes(query)
+        );
+
+        if (subjectMatches || matchingTopics.length > 0) {
+            foundAny = true;
+            
+            // Заголовок группы (Название предмета)
+            const groupTitle = document.createElement('div');
+            groupTitle.className = 'search-group-title';
+            groupTitle.textContent = subject.title;
+            subjectsListEl.appendChild(groupTitle);
+
+            // Если совпал сам предмет, показываем все его темы (или первые 5 для компактности)
+            if (subjectMatches) {
+                subject.topics.slice(0, 5).forEach(topic => {
+                    addSearchResult(subjectKey, subject.title, topic.id, topic.title);
+                });
+                if (subject.topics.length > 5) {
+                    const more = document.createElement('div');
+                    more.className = 'search-result-subject';
+                    more.style.padding = '5px 20px 15px 20px';
+                    more.textContent = `... и еще ${subject.topics.length - 5} тем`;
+                    subjectsListEl.appendChild(more);
+                }
+            } else {
+                // Если совпали только темы, показываем только их
+                matchingTopics.forEach(topic => {
+                    addSearchResult(subjectKey, subject.title, topic.id, topic.title);
+                });
+            }
+        }
+    }
+
+    if (!foundAny) {
+        subjectsListEl.innerHTML = '<div class="search-no-results">Ничего не найдено</div>';
+    }
+}
+
+// Вспомогательная функция для добавления результата в список
+function addSearchResult(subjectId, subjectTitle, topicId, topicTitle) {
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.innerHTML = `
+        <span class="search-result-title">${topicTitle}</span>
+        <span class="search-result-subject">${subjectTitle}</span>
+    `;
+    div.onclick = () => {
+        selectSubject(subjectId);
+        selectTopic(subjectId, topicId, topicTitle);
+    };
+    subjectsListEl.appendChild(div);
+}
+
+// ==========================================
+// 5. НАВИГАЦИЯ
+// ==========================================
 function selectSubject(subjectId) {
     currentSubject = subjectId;
     currentTopic = null;
     
-    // Подсветка активного предмета
+    // Очищаем поиск при выборе предмета
+    searchInput.value = '';
+
     document.querySelectorAll('.subject-item').forEach(el => {
         el.classList.toggle('active', el.dataset.id === subjectId);
     });
 
-    // Обновляем заголовок
     headerTitleEl.textContent = lecturesData[subjectId].title;
-
-    // Рендерим список тем
     contentBodyEl.innerHTML = '';
+    
     const ul = document.createElement('ul');
     ul.className = 'topics-list';
     
@@ -145,24 +221,26 @@ function selectSubject(subjectId) {
     });
 
     contentBodyEl.appendChild(ul);
-
-    // Мобильная навигация (показываем контент)
     appContainer.classList.add('show-content');
-    
-    // Обновляем URL
     window.location.hash = `${subjectId}`;
+    
+    // Восстанавливаем список предметов, если мы были в поиске
+    if (searchInput.value === '') renderSubjects();
 }
 
 function selectTopic(subjectId, topicId, topicTitle) {
     currentTopic = topicId;
+    // Очищаем поиск, чтобы при нажатии "Назад" был нормальный список
+    searchInput.value = '';
+    renderSubjects(); 
+
     headerTitleEl.textContent = `${lecturesData[subjectId].title} / ${topicTitle}`;
-    
     window.location.hash = `${subjectId}/${topicId}`;
     renderPasswordForm(subjectId, topicId);
 }
 
 // ==========================================
-// 5. ФОРМА ПАРОЛЯ И ЗАГРУЗКА
+// 6. ПАРОЛЬ И ЗАГРУЗКА
 // ==========================================
 function renderPasswordForm(subjectId, topicId) {
     contentBodyEl.innerHTML = `
@@ -180,8 +258,7 @@ function renderPasswordForm(subjectId, topicId) {
     const errorMsg = document.getElementById('errorMsg');
 
     const checkPassword = () => {
-        const correctPassword = getDailyPassword();
-        if (input.value.trim() === correctPassword) {
+        if (input.value.trim() === getDailyPassword()) {
             loadLecture(subjectId, topicId);
         } else {
             errorMsg.textContent = 'Неверный пароль. Попробуйте еще раз.';
@@ -190,15 +267,11 @@ function renderPasswordForm(subjectId, topicId) {
     };
 
     btn.onclick = checkPassword;
-    input.onkeypress = (e) => {
-        if (e.key === 'Enter') checkPassword();
-    };
+    input.onkeypress = (e) => { if (e.key === 'Enter') checkPassword(); };
 }
 
 function loadLecture(subjectId, topicId) {
     contentBodyEl.innerHTML = '<div style="color: #7f91a4; text-align: center; margin-top: 50px;">Загрузка...</div>';
-    
-    // Формируем путь: lectures/электротехника/файл.txt
     const filePath = `lectures/${subjectId}/${topicId}.txt`;
 
     fetch(filePath)
@@ -209,7 +282,7 @@ function loadLecture(subjectId, topicId) {
         .then(text => {
             const pre = document.createElement('div');
             pre.className = 'lecture-text';
-            pre.textContent = text; // Сохраняет переносы строк
+            pre.textContent = text; 
             contentBodyEl.innerHTML = ''; 
             contentBodyEl.appendChild(pre);
         })
@@ -224,7 +297,7 @@ function loadLecture(subjectId, topicId) {
 }
 
 // ==========================================
-// 6. НАВИГАЦИЯ (ХЭШ, КНОПКА НАЗАД)
+// 7. ОБРАБОТЧИКИ СОБЫТИЙ
 // ==========================================
 backBtn.onclick = () => {
     appContainer.classList.remove('show-content');
@@ -234,6 +307,9 @@ backBtn.onclick = () => {
         window.location.hash = '';
     }
 };
+
+// Слушатель поиска (срабатывает при каждом вводе символа)
+searchInput.addEventListener('input', handleSearch);
 
 function handleHashChange() {
     const hash = window.location.hash.substring(1); 
@@ -257,7 +333,7 @@ function handleHashChange() {
 }
 
 // ==========================================
-// 7. ИНИЦИАЛИЗАЦИЯ
+// 8. ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 renderSubjects();
 window.addEventListener('load', handleHashChange);
