@@ -1,5 +1,5 @@
 // ==========================================
-// 1. БАЗА ДАННЫХ ЛЕКЦИЙ (Ваши данные)
+// 1. БАЗА ДАННЫХ ЛЕКЦИЙ
 // ==========================================
 const lecturesData = {
     electro: {
@@ -83,13 +83,13 @@ const contentBodyEl = document.getElementById('contentBody');
 const headerTitleEl = document.getElementById('headerTitle');
 const backBtn = document.getElementById('backBtn');
 const appContainer = document.querySelector('.app-container');
-const searchInput = document.getElementById('searchInput'); // Поле поиска
+const searchInput = document.getElementById('searchInput');
 
 let currentSubject = null;
 let currentTopic = null;
 
 // ==========================================
-// 3. ГЕНЕРАЦИЯ ПАРОЛЯ
+// 3. ГЕНЕРАЦИЯ ПАРОЛЯ (МОСКОВСКОЕ ВРЕМЯ)
 // ==========================================
 function getDailyPassword() {
     const now = new Date();
@@ -100,6 +100,7 @@ function getDailyPassword() {
     const month = mskTime.getMonth() + 1;
     const day = mskTime.getDate();
 
+    // Формула: Год * Месяц * День
     return (parseInt(year) * month * day).toString();
 }
 
@@ -119,26 +120,16 @@ function renderSubjects() {
     }
 }
 
-// Функция поиска
 function handleSearch() {
     const query = searchInput.value.toLowerCase().trim();
-    
-    // Если поле пустое, показываем обычный список предметов
-    if (query.length === 0) {
-        renderSubjects();
-        return;
-    }
+    if (query.length === 0) { renderSubjects(); return; }
 
-    subjectsListEl.innerHTML = ''; // Очищаем
+    subjectsListEl.innerHTML = ''; 
     let foundAny = false;
 
     for (const subjectKey in lecturesData) {
         const subject = lecturesData[subjectKey];
-        
-        // 1. Проверяем, совпадает ли название предмета
         const subjectMatches = subject.title.toLowerCase().includes(query);
-        
-        // 2. Ищем совпадения по темам
         const matchingTopics = subject.topics.filter(topic => 
             topic.title.toLowerCase().includes(query)
         );
@@ -146,13 +137,11 @@ function handleSearch() {
         if (subjectMatches || matchingTopics.length > 0) {
             foundAny = true;
             
-            // Заголовок группы (Название предмета)
             const groupTitle = document.createElement('div');
             groupTitle.className = 'search-group-title';
             groupTitle.textContent = subject.title;
             subjectsListEl.appendChild(groupTitle);
 
-            // Если совпал сам предмет, показываем все его темы (или первые 5 для компактности)
             if (subjectMatches) {
                 subject.topics.slice(0, 5).forEach(topic => {
                     addSearchResult(subjectKey, subject.title, topic.id, topic.title);
@@ -165,7 +154,6 @@ function handleSearch() {
                     subjectsListEl.appendChild(more);
                 }
             } else {
-                // Если совпали только темы, показываем только их
                 matchingTopics.forEach(topic => {
                     addSearchResult(subjectKey, subject.title, topic.id, topic.title);
                 });
@@ -178,7 +166,6 @@ function handleSearch() {
     }
 }
 
-// Вспомогательная функция для добавления результата в список
 function addSearchResult(subjectId, subjectTitle, topicId, topicTitle) {
     const div = document.createElement('div');
     div.className = 'search-result-item';
@@ -199,8 +186,6 @@ function addSearchResult(subjectId, subjectTitle, topicId, topicTitle) {
 function selectSubject(subjectId) {
     currentSubject = subjectId;
     currentTopic = null;
-    
-    // Очищаем поиск при выборе предмета
     searchInput.value = '';
 
     document.querySelectorAll('.subject-item').forEach(el => {
@@ -224,13 +209,11 @@ function selectSubject(subjectId) {
     appContainer.classList.add('show-content');
     window.location.hash = `${subjectId}`;
     
-    // Восстанавливаем список предметов, если мы были в поиске
     if (searchInput.value === '') renderSubjects();
 }
 
 function selectTopic(subjectId, topicId, topicTitle) {
     currentTopic = topicId;
-    // Очищаем поиск, чтобы при нажатии "Назад" был нормальный список
     searchInput.value = '';
     renderSubjects(); 
 
@@ -240,13 +223,13 @@ function selectTopic(subjectId, topicId, topicTitle) {
 }
 
 // ==========================================
-// 6. ПАРОЛЬ И ЗАГРУЗКА
+// 6. ПАРОЛЬ И ЗАГРУЗКА (БЕЗ ПОДСКАЗОК)
 // ==========================================
 function renderPasswordForm(subjectId, topicId) {
     contentBodyEl.innerHTML = `
         <div class="password-form">
             <h3>Доступ к лекции</h3>
-            <p style="margin-bottom: 15px; color: #7f91a4; font-size: 14px;">Введите пароль дня для просмотра</p>
+            <p style="margin-bottom: 20px; color: #7f91a4; font-size: 14px;">Введите пароль для просмотра</p>
             <input type="text" id="passInput" placeholder="Введите пароль" autocomplete="off">
             <button id="submitPassBtn">Войти</button>
             <div id="errorMsg" class="error-msg"></div>
@@ -261,7 +244,7 @@ function renderPasswordForm(subjectId, topicId) {
         if (input.value.trim() === getDailyPassword()) {
             loadLecture(subjectId, topicId);
         } else {
-            errorMsg.textContent = 'Неверный пароль. Попробуйте еще раз.';
+            errorMsg.textContent = 'Неверный пароль.';
             input.value = '';
         }
     };
@@ -272,9 +255,11 @@ function renderPasswordForm(subjectId, topicId) {
 
 function loadLecture(subjectId, topicId) {
     contentBodyEl.innerHTML = '<div style="color: #7f91a4; text-align: center; margin-top: 50px;">Загрузка...</div>';
+    
     const filePath = `lectures/${subjectId}/${topicId}.txt`;
 
-    fetch(filePath)
+    // Запрет кэширования
+    fetch(filePath, { cache: "no-store" })
         .then(response => {
             if (!response.ok) throw new Error('Файл не найден');
             return response.text();
@@ -297,7 +282,7 @@ function loadLecture(subjectId, topicId) {
 }
 
 // ==========================================
-// 7. ОБРАБОТЧИКИ СОБЫТИЙ
+// 7. ОБРАБОТЧИКИ И ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 backBtn.onclick = () => {
     appContainer.classList.remove('show-content');
@@ -308,7 +293,6 @@ backBtn.onclick = () => {
     }
 };
 
-// Слушатель поиска (срабатывает при каждом вводе символа)
 searchInput.addEventListener('input', handleSearch);
 
 function handleHashChange() {
@@ -332,9 +316,7 @@ function handleHashChange() {
     }
 }
 
-// ==========================================
-// 8. ИНИЦИАЛИЗАЦИЯ
-// ==========================================
+// Запуск
 renderSubjects();
 window.addEventListener('load', handleHashChange);
 window.addEventListener('hashchange', handleHashChange);
