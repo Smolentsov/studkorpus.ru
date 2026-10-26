@@ -224,10 +224,13 @@ body {
     font-size: 14px;
 }
 
+/* --- Текст лекции --- */
 .lecture-text {
     white-space: pre-wrap;
     font-size: 16px;
     color: #e1e1e1;
+    /* ВОТ ОНА — МАГИЯ МОНОШИРИННОГО ШРИФТА */
+    font-family: Consolas, "Courier New", monospace; 
 }
 
 /* Адаптивность */
