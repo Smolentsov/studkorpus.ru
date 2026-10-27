@@ -1,15 +1,8 @@
 // ==========================================
-// 1. БАЗА ДАННЫХ (Отсортировано по алфавиту)
+// 1. БАЗА ДАННЫХ (Алфавит по предметам, внутри: Лекции -> Практика -> Лабы)
 // ==========================================
 const lecturesData = {
-    mechanics_labs: {
-        title: 'Техническая механика (Лабораторные)',
-        topics: [
-            { id: 'lab_01', title: '1. Лабораторная работа 1' },
-            { id: 'lab_02', title: '2. Лабораторная работа 2' }
-            // Добавьте сюда темы для лаб по механике
-        ]
-    },
+    // --- ТЕХНИЧЕСКАЯ МЕХАНИКА ---
     mechanics_lectures: {
         title: 'Техническая механика (Лекции)',
         topics: [
@@ -52,32 +45,16 @@ const lecturesData = {
             // Добавьте сюда темы для практик по механике
         ]
     },
-    electro_labs: {
-        title: 'Электротехника (Лабораторные)',
+    mechanics_labs: {
+        title: 'Техническая механика (Лабораторные)',
         topics: [
-            { id: 'lab_01_capacitors', title: '1. Устройство и виды исполнения конденсаторов' },
-            { id: 'lab_02_dc_circuits', title: '2. Простейшие линейные электрические цепи постоянного тока' },
-            { id: 'lab_03_mixed_connection', title: '3. Смешанное соединение элементов в цепи постоянного тока' },
-            { id: 'lab_04_mixed_connection_2', title: '4. Смешанное соединение элементов (продолжение)' },
-            { id: 'lab_05_ferromagnetics', title: '5. Виды ферромагнитных материалов' },
-            { id: 'lab_06_ac_params', title: '6. Определение параметров элементов цепей переменного тока' },
-            { id: 'lab_07_ac_params_2', title: '7. Определение параметров элементов цепей переменного тока (продолжение)' },
-            { id: 'lab_08_ac_series', title: '8. Электрические цепи переменного тока с последовательным соединением' },
-            { id: 'lab_09_ac_series_2', title: '9. Электрические цепи переменного тока (продолжение)' },
-            { id: 'lab_10_three_phase_star', title: '10. Соединение трёхфазной цепи по схемам «звезда» и «треугольник»' },
-            { id: 'lab_11_three_phase_star_2', title: '11. Соединение трёхфазной цепи (продолжение)' },
-            { id: 'lab_12_measurements', title: '12. Электроизмерительные приборы и измерения' },
-            { id: 'lab_13_measurements_2', title: '13. Электроизмерительные приборы и измерения (продолжение)' },
-            { id: 'lab_14_multimeter', title: '14. Правила работы с мультиметром' },
-            { id: 'lab_15_multimeter_2', title: '15. Правила работы с мультиметром (продолжение)' },
-            { id: 'lab_16_async_motor_start', title: '16. Исследование схемы пуска асинхронного двигателя' },
-            { id: 'lab_17_async_motor_start_2', title: '17. Сборка схемы пуска асинхронного двигателя' },
-            { id: 'lab_18_async_motor_start_3', title: '18. Сборка схемы пуска асинхронного двигателя (продолжение)' },
-            { id: 'lab_19_diodes', title: '19. Исследование диодов' },
-            { id: 'lab_20_transistors', title: '20. Исследование биполярного транзистора' },
-            { id: 'lab_21_rectifiers', title: '21. Исследование схем выпрямления' }
+            { id: 'lab_01', title: '1. Лабораторная работа 1' },
+            { id: 'lab_02', title: '2. Лабораторная работа 2' }
+            // Добавьте сюда темы для лаб по механике
         ]
     },
+
+    // --- ЭЛЕКТРОТЕХНИКА ---
     electro: {
         title: 'Электротехника (Лекции)',
         topics: [
@@ -146,6 +123,32 @@ const lecturesData = {
             { id: '26_rectifiers_calc', title: '26. Расчёт выпрямителей и фильтров переменного тока' },
             { id: '27_rectifiers_calc_2', title: '27. Расчёт выпрямителей и фильтров (продолжение)' }
         ]
+    },
+    electro_labs: {
+        title: 'Электротехника (Лабораторные)',
+        topics: [
+            { id: 'lab_01_capacitors', title: '1. Устройство и виды исполнения конденсаторов' },
+            { id: 'lab_02_dc_circuits', title: '2. Простейшие линейные электрические цепи постоянного тока' },
+            { id: 'lab_03_mixed_connection', title: '3. Смешанное соединение элементов в цепи постоянного тока' },
+            { id: 'lab_04_mixed_connection_2', title: '4. Смешанное соединение элементов (продолжение)' },
+            { id: 'lab_05_ferromagnetics', title: '5. Виды ферромагнитных материалов' },
+            { id: 'lab_06_ac_params', title: '6. Определение параметров элементов цепей переменного тока' },
+            { id: 'lab_07_ac_params_2', title: '7. Определение параметров элементов цепей переменного тока (продолжение)' },
+            { id: 'lab_08_ac_series', title: '8. Электрические цепи переменного тока с последовательным соединением' },
+            { id: 'lab_09_ac_series_2', title: '9. Электрические цепи переменного тока (продолжение)' },
+            { id: 'lab_10_three_phase_star', title: '10. Соединение трёхфазной цепи по схемам «звезда» и «треугольник»' },
+            { id: 'lab_11_three_phase_star_2', title: '11. Соединение трёхфазной цепи (продолжение)' },
+            { id: 'lab_12_measurements', title: '12. Электроизмерительные приборы и измерения' },
+            { id: 'lab_13_measurements_2', title: '13. Электроизмерительные приборы и измерения (продолжение)' },
+            { id: 'lab_14_multimeter', title: '14. Правила работы с мультиметром' },
+            { id: 'lab_15_multimeter_2', title: '15. Правила работы с мультиметром (продолжение)' },
+            { id: 'lab_16_async_motor_start', title: '16. Исследование схемы пуска асинхронного двигателя' },
+            { id: 'lab_17_async_motor_start_2', title: '17. Сборка схемы пуска асинхронного двигателя' },
+            { id: 'lab_18_async_motor_start_3', title: '18. Сборка схемы пуска асинхронного двигателя (продолжение)' },
+            { id: 'lab_19_diodes', title: '19. Исследование диодов' },
+            { id: 'lab_20_transistors', title: '20. Исследование биполярного транзистора' },
+            { id: 'lab_21_rectifiers', title: '21. Исследование схем выпрямления' }
+        ]
     }
 };
 
@@ -160,20 +163,19 @@ const appContainer = document.querySelector('.app-container');
 const searchInput = document.getElementById('searchInput');
 
 // ==========================================
-// 3. БЕЗОПАСНАЯ РАБОТА С ПАМЯТЬЮ (LocalStorage)
+// 3. БЕЗОПАСНАЯ РАБОТА С ПАМЯТЬЮ
 // ==========================================
-// Если браузер блокирует память (Инкогнито), мы просто отключаем кэш паролей
 const safeStorage = {
     getItem: (key) => {
         try { return localStorage.getItem(key); } catch(e) { return null; }
     },
     setItem: (key, value) => {
-        try { localStorage.setItem(key, value); } catch(e) { /* Игнорируем ошибку */ }
+        try { localStorage.setItem(key, value); } catch(e) { /* Игнорируем */ }
     }
 };
 
 // ==========================================
-// 4. ГЕНЕРАЦИЯ ПАРОЛЯ (МОСКОВСКОЕ ВРЕМЯ)
+// 4. ГЕНЕРАЦИЯ ПАРОЛЯ
 // ==========================================
 function getDailyPassword() {
     const now = new Date();
@@ -192,6 +194,7 @@ function getDailyPassword() {
 // ==========================================
 function renderSubjects() {
     subjectsListEl.innerHTML = '';
+    // Проходимся по объекту. Так как он создан в нужном порядке, на экране будет тот же порядок.
     for (const key in lecturesData) {
         const subject = lecturesData[key];
         const div = document.createElement('div');
@@ -267,7 +270,7 @@ function addSearchResult(subjectId, subjectTitle, topicId, topicTitle) {
 // 6. НАВИГАЦИЯ
 // ==========================================
 function selectSubject(subjectId) {
-    if (!lecturesData[subjectId]) return; // Защита от битых ссылок
+    if (!lecturesData[subjectId]) return; 
     
     searchInput.value = '';
     document.querySelectorAll('.subject-item').forEach(el => {
@@ -290,7 +293,6 @@ function selectSubject(subjectId) {
     contentBodyEl.appendChild(ul);
     appContainer.classList.add('show-content');
     
-    // Обновляем URL только если мы реально меняем предмет
     const currentHash = window.location.hash.substring(1).split('/')[0];
     if (currentHash !== subjectId) {
         window.location.hash = `${subjectId}`;
@@ -365,15 +367,13 @@ function loadLecture(subjectId, topicId) {
 }
 
 // ==========================================
-// 8. ОБРАБОТЧИКИ СОБЫТИЙ И ИНИЦИАЛИЗАЦИЯ
+// 8. ОБРАБОТЧИКИ И ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 backBtn.onclick = () => {
-    // Если мы на странице пароля/лекции, возвращаемся к списку тем текущего предмета
     const hashParts = window.location.hash.substring(1).split('/');
     if (hashParts.length > 1) {
-        window.location.hash = hashParts[0]; // Оставляем только предмет
+        window.location.hash = hashParts[0]; 
     } else {
-        // Если мы в списке тем, полностью сбрасываем хэш и показываем список предметов
         appContainer.classList.remove('show-content');
         window.location.hash = '';
         renderSubjects();
@@ -407,13 +407,11 @@ function handleHashChange() {
     }
 }
 
-// Запуск при загрузке
 try {
     renderSubjects();
     window.addEventListener('load', handleHashChange);
     window.addEventListener('hashchange', handleHashChange);
 } catch (e) {
-    // Если произошла критическая ошибка, выводим сообщение, чтобы не было "пустого экрана"
     document.body.innerHTML = `<div style="text-align:center; padding:50px; color:white;">
         <h1>Произошла ошибка при загрузке</h1>
         <p>Пожалуйста, обновите страницу или попробуйте позже.</p>
