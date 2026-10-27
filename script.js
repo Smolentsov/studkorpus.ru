@@ -1,9 +1,17 @@
 // ==========================================
-// 1. БАЗА ДАННЫХ ЛЕКЦИЙ (Отсортировано по алфавиту)
+// 1. БАЗА ДАННЫХ (Отсортировано по алфавиту)
 // ==========================================
 const lecturesData = {
-    mechanics: {
-        title: 'Техническая механика',
+    mechanics_labs: {
+        title: 'Техническая механика (Лабораторные)',
+        topics: [
+            { id: 'lab_01', title: '1. Лабораторная работа 1' },
+            { id: 'lab_02', title: '2. Лабораторная работа 2' }
+            // Добавьте сюда темы для лаб по механике
+        ]
+    },
+    mechanics_lectures: {
+        title: 'Техническая механика (Лекции)',
         topics: [
             { id: '01_statics_basics', title: '1. Основные понятия и аксиомы статики' },
             { id: '02_converging_forces_1', title: '2. Плоская система сходящихся сил: сложение' },
@@ -36,13 +44,21 @@ const lecturesData = {
             { id: '29_material_testing', title: '29. Испытания материалов на растяжение и сжатие' }
         ]
     },
+    mechanics_practice: {
+        title: 'Техническая механика (Практика)',
+        topics: [
+            { id: 'prac_01', title: '1. Практическая работа 1' },
+            { id: 'prac_02', title: '2. Практическая работа 2' }
+            // Добавьте сюда темы для практик по механике
+        ]
+    },
     electro_labs: {
         title: 'Электротехника (Лабораторные)',
         topics: [
             { id: 'lab_01_capacitors', title: '1. Устройство и виды исполнения конденсаторов' },
             { id: 'lab_02_dc_circuits', title: '2. Простейшие линейные электрические цепи постоянного тока' },
             { id: 'lab_03_mixed_connection', title: '3. Смешанное соединение элементов в цепи постоянного тока' },
-            { id: 'lab_04_mixed_connection_2', title: '4. Смешанное соединение элементов в цепи постоянного тока (продолжение)' },
+            { id: 'lab_04_mixed_connection_2', title: '4. Смешанное соединение элементов (продолжение)' },
             { id: 'lab_05_ferromagnetics', title: '5. Виды ферромагнитных материалов' },
             { id: 'lab_06_ac_params', title: '6. Определение параметров элементов цепей переменного тока' },
             { id: 'lab_07_ac_params_2', title: '7. Определение параметров элементов цепей переменного тока (продолжение)' },
@@ -134,7 +150,7 @@ const lecturesData = {
 };
 
 // ==========================================
-// 2. DOM ЭЛЕМЕНТЫ
+// 2. DOM ЭЛЕМЕНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ==========================================
 const subjectsListEl = document.getElementById('subjectsList');
 const contentBodyEl = document.getElementById('contentBody');
@@ -143,11 +159,21 @@ const backBtn = document.getElementById('backBtn');
 const appContainer = document.querySelector('.app-container');
 const searchInput = document.getElementById('searchInput');
 
-let currentSubject = null;
-let currentTopic = null;
+// ==========================================
+// 3. БЕЗОПАСНАЯ РАБОТА С ПАМЯТЬЮ (LocalStorage)
+// ==========================================
+// Если браузер блокирует память (Инкогнито), мы просто отключаем кэш паролей
+const safeStorage = {
+    getItem: (key) => {
+        try { return localStorage.getItem(key); } catch(e) { return null; }
+    },
+    setItem: (key, value) => {
+        try { localStorage.setItem(key, value); } catch(e) { /* Игнорируем ошибку */ }
+    }
+};
 
 // ==========================================
-// 3. ГЕНЕРАЦИЯ ПАРОЛЯ (МОСКОВСКОЕ ВРЕМЯ)
+// 4. ГЕНЕРАЦИЯ ПАРОЛЯ (МОСКОВСКОЕ ВРЕМЯ)
 // ==========================================
 function getDailyPassword() {
     const now = new Date();
@@ -162,7 +188,7 @@ function getDailyPassword() {
 }
 
 // ==========================================
-// 4. РЕНДЕРИНГ И ПОИСК
+// 5. РЕНДЕРИНГ И ПОИСК
 // ==========================================
 function renderSubjects() {
     subjectsListEl.innerHTML = '';
@@ -238,13 +264,12 @@ function addSearchResult(subjectId, subjectTitle, topicId, topicTitle) {
 }
 
 // ==========================================
-// 5. НАВИГАЦИЯ
+// 6. НАВИГАЦИЯ
 // ==========================================
 function selectSubject(subjectId) {
-    currentSubject = subjectId;
-    currentTopic = null;
+    if (!lecturesData[subjectId]) return; // Защита от битых ссылок
+    
     searchInput.value = '';
-
     document.querySelectorAll('.subject-item').forEach(el => {
         el.classList.toggle('active', el.dataset.id === subjectId);
     });
@@ -264,13 +289,15 @@ function selectSubject(subjectId) {
 
     contentBodyEl.appendChild(ul);
     appContainer.classList.add('show-content');
-    window.location.hash = `${subjectId}`;
     
-    if (searchInput.value === '') renderSubjects();
+    // Обновляем URL только если мы реально меняем предмет
+    const currentHash = window.location.hash.substring(1).split('/')[0];
+    if (currentHash !== subjectId) {
+        window.location.hash = `${subjectId}`;
+    }
 }
 
 function selectTopic(subjectId, topicId, topicTitle) {
-    currentTopic = topicId;
     searchInput.value = '';
     renderSubjects(); 
 
@@ -280,7 +307,7 @@ function selectTopic(subjectId, topicId, topicTitle) {
 }
 
 // ==========================================
-// 6. ПАРОЛЬ И ЗАГРУЗКА
+// 7. ПАРОЛЬ И ЗАГРУЗКА
 // ==========================================
 function renderPasswordForm(subjectId, topicId) {
     contentBodyEl.innerHTML = `
@@ -313,7 +340,6 @@ function renderPasswordForm(subjectId, topicId) {
 function loadLecture(subjectId, topicId) {
     contentBodyEl.innerHTML = '<div style="color: #7f91a4; text-align: center; margin-top: 50px;">Загрузка...</div>';
     
-    // Путь: lectures/название_предмета/название_файла.txt
     const filePath = `lectures/${subjectId}/${topicId}.txt`;
 
     fetch(filePath, { cache: "no-store" })
@@ -331,7 +357,7 @@ function loadLecture(subjectId, topicId) {
         .catch(error => {
             contentBodyEl.innerHTML = `
                 <div class="empty-state">
-                    <p style="color: #e53935;">Ошибка: Лекция находится в разработке или файл не найден.</p>
+                    <p style="color: #e53935;">Ошибка: Материал находится в разработке или файл не найден.</p>
                     <p style="font-size: 12px; margin-top: 10px; color: #7f91a4;">Искомый путь: ${filePath}</p>
                 </div>
             `;
@@ -339,14 +365,18 @@ function loadLecture(subjectId, topicId) {
 }
 
 // ==========================================
-// 7. ОБРАБОТЧИКИ И ИНИЦИАЛИЗАЦИЯ
+// 8. ОБРАБОТЧИКИ СОБЫТИЙ И ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 backBtn.onclick = () => {
-    appContainer.classList.remove('show-content');
-    if (currentSubject) {
-         selectSubject(currentSubject);
+    // Если мы на странице пароля/лекции, возвращаемся к списку тем текущего предмета
+    const hashParts = window.location.hash.substring(1).split('/');
+    if (hashParts.length > 1) {
+        window.location.hash = hashParts[0]; // Оставляем только предмет
     } else {
+        // Если мы в списке тем, полностью сбрасываем хэш и показываем список предметов
+        appContainer.classList.remove('show-content');
         window.location.hash = '';
+        renderSubjects();
     }
 };
 
@@ -354,7 +384,11 @@ searchInput.addEventListener('input', handleSearch);
 
 function handleHashChange() {
     const hash = window.location.hash.substring(1); 
-    if (!hash) return;
+    if (!hash) {
+        appContainer.classList.remove('show-content');
+        renderSubjects();
+        return;
+    }
 
     const parts = hash.split('/');
     const subjectId = parts[0];
@@ -373,7 +407,15 @@ function handleHashChange() {
     }
 }
 
-// Запуск
-renderSubjects();
-window.addEventListener('load', handleHashChange);
-window.addEventListener('hashchange', handleHashChange);
+// Запуск при загрузке
+try {
+    renderSubjects();
+    window.addEventListener('load', handleHashChange);
+    window.addEventListener('hashchange', handleHashChange);
+} catch (e) {
+    // Если произошла критическая ошибка, выводим сообщение, чтобы не было "пустого экрана"
+    document.body.innerHTML = `<div style="text-align:center; padding:50px; color:white;">
+        <h1>Произошла ошибка при загрузке</h1>
+        <p>Пожалуйста, обновите страницу или попробуйте позже.</p>
+    </div>`;
+}
