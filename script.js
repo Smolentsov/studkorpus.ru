@@ -1,5 +1,5 @@
 // ==========================================
-// 1. БАЗА ДАННЫХ (Алфавит по предметам, внутри: Лекции -> Практика -> Лабы)
+// 1. БАЗА ДАННЫХ
 // ==========================================
 const lecturesData = {
     // --- ТЕХНИЧЕСКАЯ МЕХАНИКА ---
@@ -42,7 +42,6 @@ const lecturesData = {
         topics: [
             { id: 'prac_01', title: '1. Практическая работа 1' },
             { id: 'prac_02', title: '2. Практическая работа 2' }
-            // Добавьте сюда темы для практик по механике
         ]
     },
     mechanics_labs: {
@@ -50,7 +49,6 @@ const lecturesData = {
         topics: [
             { id: 'lab_01', title: '1. Лабораторная работа 1' },
             { id: 'lab_02', title: '2. Лабораторная работа 2' }
-            // Добавьте сюда темы для лаб по механике
         ]
     },
 
@@ -153,7 +151,7 @@ const lecturesData = {
 };
 
 // ==========================================
-// 2. DOM ЭЛЕМЕНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// 2. DOM ЭЛЕМЕНТЫ И ПЕРЕМЕННЫЕ
 // ==========================================
 const subjectsListEl = document.getElementById('subjectsList');
 const contentBodyEl = document.getElementById('contentBody');
@@ -163,7 +161,27 @@ const appContainer = document.querySelector('.app-container');
 const searchInput = document.getElementById('searchInput');
 
 // ==========================================
-// 3. БЕЗОПАСНАЯ РАБОТА С ПАМЯТЬЮ
+// 3. ФУНКЦИИ УМНОГО СОКРАЩЕНИЯ
+// ==========================================
+// Функция для списка слева (сокращает)
+function getShortTitle(fullTitle) {
+    // 1. Сначала сокращаем то, что в скобках
+    let short = fullTitle
+        .replace('(Лекции)', '(Лек.)')
+        .replace('(Практика)', '(Прак.)')
+        .replace('(Лабораторные)', '(Лаб.)');
+
+    // 2. Если всё еще длинновато (больше 24 символов), сокращаем основное название
+    if (short.length > 24) {
+        short = short
+            .replace('Техническая механика', 'Тех. механика')
+            .replace('Электротехника', 'Электротех.');
+    }
+    return short;
+}
+
+// ==========================================
+// 4. БЕЗОПАСНАЯ РАБОТА С ПАМЯТЬЮ
 // ==========================================
 const safeStorage = {
     getItem: (key) => {
@@ -175,7 +193,7 @@ const safeStorage = {
 };
 
 // ==========================================
-// 4. ГЕНЕРАЦИЯ ПАРОЛЯ
+// 5. ГЕНЕРАЦИЯ ПАРОЛЯ
 // ==========================================
 function getDailyPassword() {
     const now = new Date();
@@ -190,16 +208,16 @@ function getDailyPassword() {
 }
 
 // ==========================================
-// 5. РЕНДЕРИНГ И ПОИСК
+// 6. РЕНДЕРИНГ И ПОИСК
 // ==========================================
 function renderSubjects() {
     subjectsListEl.innerHTML = '';
-    // Проходимся по объекту. Так как он создан в нужном порядке, на экране будет тот же порядок.
     for (const key in lecturesData) {
         const subject = lecturesData[key];
         const div = document.createElement('div');
         div.className = 'subject-item';
-        div.textContent = subject.title;
+        // Используем функцию сокращения для меню
+        div.textContent = getShortTitle(subject.title); 
         div.dataset.id = key;
         div.onclick = () => selectSubject(key);
         subjectsListEl.appendChild(div);
@@ -225,12 +243,13 @@ function handleSearch() {
             
             const groupTitle = document.createElement('div');
             groupTitle.className = 'search-group-title';
-            groupTitle.textContent = subject.title;
+            // В поиске тоже выводим сокращенное название
+            groupTitle.textContent = getShortTitle(subject.title);
             subjectsListEl.appendChild(groupTitle);
 
             if (subjectMatches) {
                 subject.topics.slice(0, 5).forEach(topic => {
-                    addSearchResult(subjectKey, subject.title, topic.id, topic.title);
+                    addSearchResult(subjectKey, getShortTitle(subject.title), topic.id, topic.title);
                 });
                 if (subject.topics.length > 5) {
                     const more = document.createElement('div');
@@ -241,7 +260,7 @@ function handleSearch() {
                 }
             } else {
                 matchingTopics.forEach(topic => {
-                    addSearchResult(subjectKey, subject.title, topic.id, topic.title);
+                    addSearchResult(subjectKey, getShortTitle(subject.title), topic.id, topic.title);
                 });
             }
         }
@@ -252,12 +271,12 @@ function handleSearch() {
     }
 }
 
-function addSearchResult(subjectId, subjectTitle, topicId, topicTitle) {
+function addSearchResult(subjectId, subjectShortTitle, topicId, topicTitle) {
     const div = document.createElement('div');
     div.className = 'search-result-item';
     div.innerHTML = `
         <span class="search-result-title">${topicTitle}</span>
-        <span class="search-result-subject">${subjectTitle}</span>
+        <span class="search-result-subject">${subjectShortTitle}</span>
     `;
     div.onclick = () => {
         selectSubject(subjectId);
@@ -267,7 +286,7 @@ function addSearchResult(subjectId, subjectTitle, topicId, topicTitle) {
 }
 
 // ==========================================
-// 6. НАВИГАЦИЯ
+// 7. НАВИГАЦИЯ
 // ==========================================
 function selectSubject(subjectId) {
     if (!lecturesData[subjectId]) return; 
@@ -277,6 +296,7 @@ function selectSubject(subjectId) {
         el.classList.toggle('active', el.dataset.id === subjectId);
     });
 
+    // В ШАПКЕ выводим ПОЛНОЕ название без сокращений
     headerTitleEl.textContent = lecturesData[subjectId].title;
     contentBodyEl.innerHTML = '';
     
@@ -303,13 +323,14 @@ function selectTopic(subjectId, topicId, topicTitle) {
     searchInput.value = '';
     renderSubjects(); 
 
+    // В ШАПКЕ выводим ПОЛНОЕ название предмета
     headerTitleEl.textContent = `${lecturesData[subjectId].title} / ${topicTitle}`;
     window.location.hash = `${subjectId}/${topicId}`;
     renderPasswordForm(subjectId, topicId);
 }
 
 // ==========================================
-// 7. ПАРОЛЬ И ЗАГРУЗКА
+// 8. ПАРОЛЬ И ЗАГРУЗКА
 // ==========================================
 function renderPasswordForm(subjectId, topicId) {
     contentBodyEl.innerHTML = `
@@ -367,7 +388,7 @@ function loadLecture(subjectId, topicId) {
 }
 
 // ==========================================
-// 8. ОБРАБОТЧИКИ И ИНИЦИАЛИЗАЦИЯ
+// 9. ОБРАБОТЧИКИ
 // ==========================================
 backBtn.onclick = () => {
     const hashParts = window.location.hash.substring(1).split('/');
